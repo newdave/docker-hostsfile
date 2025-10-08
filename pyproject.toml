@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 120
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.bandit]
+exclude_dirs = ["tests", "test_*.py"]
+skips = ["B603", "B607"]  # subprocess without shell=True is OK
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pylint.messages_control]
+max-line-length = 120
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0913",  # too-many-arguments
+    "R0914",  # too-many-locals
+    "R0915",  # too-many-statements
+]
+good-names = ["i", "j", "k", "ex", "ip", "_"]
