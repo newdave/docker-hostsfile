@@ -1,0 +1,108 @@
+# Pre-commit hooks for Docker Hosts File Updater
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-yaml
+    args: [--unsafe]      # Allow custom tags in docker-compose
+  - id: check-added-large-files
+    args: [--maxkb=1000]
+  - id: check-merge-conflict
+  - id: check-case-conflict
+  - id: mixed-line-ending
+
+  # Python: Black formatter
+- repo: https://github.com/psf/black
+  rev: 24.1.1
+  hooks:
+  - id: black
+    language_version: python3.12
+    args: [--line-length=120]
+
+  # Python: isort import sorting
+- repo: https://github.com/pycqa/isort
+  rev: 5.13.2
+  hooks:
+  - id: isort
+    args: [--profile=black, --line-length=120]
+
+  # Python: flake8 linting
+- repo: https://github.com/pycqa/flake8
+  rev: 7.0.0
+  hooks:
+  - id: flake8
+    args:
+    - --max-line-length=120
+    - --extend-ignore=E203,W503        # Black compatibility
+    - --max-complexity=15
+
+  # Python: pylint
+- repo: https://github.com/pycqa/pylint
+  rev: v3.0.3
+  hooks:
+  - id: pylint
+    args:
+    - --max-line-length=120
+    - --disable=C0114,C0115,C0116        # Missing docstrings (too strict)
+    - --disable=R0913,R0914,R0915        # Too many args/locals/statements
+    - --good-names=i,j,k,ex,ip,_
+
+  # Python: mypy type checking
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.8.0
+  hooks:
+  - id: mypy
+    args: [--ignore-missing-imports, --no-strict-optional]
+
+  # Python: bandit security linting
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.7.6
+  hooks:
+  - id: bandit
+    args: [-c, pyproject.toml]
+    additional_dependencies: ['bandit[toml]']
+
+  # Docker: hadolint Dockerfile linting
+- repo: https://github.com/hadolint/hadolint
+  rev: v2.12.0
+  hooks:
+  - id: hadolint-docker
+    args: [--ignore, DL3008, --ignore, DL3013]      # Pin versions (too strict for dev)
+
+  # GitHub Actions: actionlint
+- repo: https://github.com/rhysd/actionlint
+  rev: v1.6.26
+  hooks:
+  - id: actionlint-docker
+
+  # YAML formatting
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.12.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --indent, '2']
+    exclude: ^\.github/workflows/      # Don't reformat GH Actions
+
+  # Markdown linting
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.39.0
+  hooks:
+  - id: markdownlint
+    args: [--fix]
+
+  # Shell script linting
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: v0.9.0.6
+  hooks:
+  - id: shellcheck
+
+# Configuration for specific hooks
+default_language_version:
+  python: python3.12

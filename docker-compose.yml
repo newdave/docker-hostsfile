@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  hosts-updater:
+    image: python:3.12-slim
+    container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+
+    volumes:
+      # Docker socket for monitoring (read-only for security)
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Host's /etc/hosts file
+    - /etc/hosts:/etc/hosts
+      # The updater script
+    - ./docker_hosts_updater.py:/app/updater.py:ro
+
+    # Command with optional domain override
+    # Option 1: Use environment variable (see below)
+    command: python /app/updater.py 30s
+
+    # Option 2: Specify domain via command line
+    # command: python /app/updater.py 30s --domain example.com
+
+    # Required for modifying /etc/hosts
+    cap_add:
+    - NET_ADMIN
+
+    # Optional: limit resources
+    mem_limit: 256m
+    cpus: 0.5
+
+    # Environment variables (optional customization)
+    environment:
+    - PYTHONUNBUFFERED=1
+      # Set custom domain base for FQDNs (default: base.domain)
+    - DOCKER_HOSTS_DOMAIN=base.domain
+      # Uncomment to use a different domain:
+      # - DOCKER_HOSTS_DOMAIN=example.com
+      # - DOCKER_HOSTS_DOMAIN=local.dev
+
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
