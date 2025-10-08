@@ -1,6 +1,7 @@
 # Docker Hosts File Updater
 
-Automatically updates your Docker host's `/etc/hosts` file with running container hostnames and IPs, including FQDNs using `base.domain` as the domain base.
+Automatically updates your Docker host's `/etc/hosts` file with running container hostnames and IPs, including FQDNs
+using `base.domain` as the domain base.
 
 ## Features
 
@@ -83,7 +84,7 @@ You can configure the base domain for FQDNs in three ways (in order of priority)
 
 The script manages a dedicated section in `/etc/hosts`:
 
-```
+```text
 # BEGIN DOCKER CONTAINERS
 172.18.0.2 nginx nginx.base.domain web web.base.domain
 172.18.0.3 postgres postgres.base.domain db db.base.domain
@@ -118,7 +119,7 @@ services:
 
 Resulting `/etc/hosts` entries:
 
-```
+```text
 172.18.0.2 web web.base.domain webserver webserver.base.domain nginx nginx.base.domain www www.base.domain
 ```
 
@@ -160,33 +161,83 @@ sudo journalctl -u docker-hosts-updater -f
 sudo systemctl stop docker-hosts-updater
 ```
 
-## Docker Compose Example
+## Docker Container Usage
 
-Run the updater itself as a Docker container:
+Pre-built container images are available at `ghcr.io/newdave/docker-hostsfile`.
+
+### Quick Start with Docker Run
+
+```bash
+# Using default settings (30s interval, base.domain)
+docker run -d \
+  --name docker-hosts-updater \
+  --network host \
+  --cap-add NET_ADMIN \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /etc/hosts:/etc/hosts \
+  ghcr.io/newdave/docker-hostsfile:latest
+
+# With custom interval and domain
+docker run -d \
+  --name docker-hosts-updater \
+  --network host \
+  --cap-add NET_ADMIN \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /etc/hosts:/etc/hosts \
+  ghcr.io/newdave/docker-hostsfile:latest 5m --domain example.com
+
+# Using environment variable for domain
+docker run -d \
+  --name docker-hosts-updater \
+  --network host \
+  --cap-add NET_ADMIN \
+  -e DOCKER_HOSTS_DOMAIN=local.dev \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /etc/hosts:/etc/hosts \
+  ghcr.io/newdave/docker-hostsfile:latest 1h
+```
+
+### Docker Compose Example
 
 ```yaml
 version: '3.8'
 
 services:
   hosts-updater:
-    image: python:3.12-slim
+    image: ghcr.io/newdave/docker-hostsfile:latest
     container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+    command: ["30s", "--domain", "base.domain"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/hosts:/etc/hosts
-      - ./docker_hosts_updater.py:/app/updater.py:ro
-    command: python /app/updater.py 30s
-    restart: unless-stopped
-    network_mode: host
     cap_add:
       - NET_ADMIN
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DOCKER_HOSTS_DOMAIN=base.domain
+    mem_limit: 256m
+    cpus: 0.5
 ```
 
-**Note**: Running as a container requires:
+See `docker-compose.example.yml` for more configuration examples.
+
+### Available Image Tags
+
+- `latest` - Latest build from main branch
+- `main` - Latest build from main branch
+- `v1.0.0` - Specific version (semver)
+- `1.0` - Major.minor version
+- `1` - Major version
+- `main-<sha>` - Specific commit SHA
+
+**Requirements**:
 
 - Access to Docker socket (read-only recommended)
 - Mount `/etc/hosts` from host
 - `NET_ADMIN` capability or run as privileged
+- Host network mode recommended
 
 ## Configuration
 

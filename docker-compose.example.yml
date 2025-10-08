@@ -1,0 +1,86 @@
+---
+# Example Docker Compose configurations for docker-hosts-updater
+
+# Example 1: Using pre-built image from GitHub Container Registry (recommended)
+version: '3.8'
+services:
+  hosts-updater:
+    image: ghcr.io/newdave/docker-hostsfile:latest
+    container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+    command: [30s, --domain, base.domain]
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/hosts:/etc/hosts
+    cap_add:
+    - NET_ADMIN
+    environment:
+    - PYTHONUNBUFFERED=1
+    mem_limit: 256m
+    cpus: 0.5
+
+---
+# Example 2: Using environment variable for domain
+version: '3.8'
+services:
+  hosts-updater:
+    image: ghcr.io/newdave/docker-hostsfile:latest
+    container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+    command: [5m]    # Update every 5 minutes
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/hosts:/etc/hosts
+    cap_add:
+    - NET_ADMIN
+    environment:
+    - PYTHONUNBUFFERED=1
+    - DOCKER_HOSTS_DOMAIN=example.com
+    mem_limit: 256m
+    cpus: 0.5
+
+---
+# Example 3: Building from local source
+version: '3.8'
+services:
+  hosts-updater:
+    build: .
+    container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+    command: [1h, --domain, local.dev]
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/hosts:/etc/hosts
+    cap_add:
+    - NET_ADMIN
+    environment:
+    - PYTHONUNBUFFERED=1
+    mem_limit: 256m
+    cpus: 0.5
+
+---
+# Example 4: Using specific version tag
+version: '3.8'
+services:
+  hosts-updater:
+    image: ghcr.io/newdave/docker-hostsfile:1.0
+    container_name: docker-hosts-updater
+    restart: unless-stopped
+    network_mode: host
+    command: [30s]
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/hosts:/etc/hosts
+    cap_add:
+    - NET_ADMIN
+    environment:
+    - PYTHONUNBUFFERED=1
+    - DOCKER_HOSTS_DOMAIN=base.domain
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
