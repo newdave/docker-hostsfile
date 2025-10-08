@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+.mypy_cache
+.pytest_cache
+.coverage
+
+# Documentation
+*.md
+!README.md
+CLAUDE.md
+IMPROVEMENTS.md
+CONTRIBUTING.md
+
+# Development
+.pre-commit-config.yaml
+.markdownlint.json
+pyproject.toml
+requirements-dev.txt
+test_updater.py
+Makefile
+
+# Docker
+docker-compose*.yml
+Dockerfile
+
+# CI/CD
+.github
+
+# Misc
+.DS_Store
+*.backup
+*.bak
