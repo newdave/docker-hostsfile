@@ -47,22 +47,22 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run Black
-        run: black --check --line-length 120 *.py
+        run: black --check --line-length 120 src/*.py tests/*.py
 
       - name: Run isort
-        run: isort --check --profile black --line-length 120 *.py
+        run: isort --check --profile black --line-length 120 src/*.py tests/*.py
 
       - name: Run flake8
-        run: flake8 --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=15 *.py
+        run: flake8 --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=15 src/*.py tests/*.py
 
       - name: Run pylint
-        run: pylint --max-line-length=120 *.py || true
+        run: pylint --max-line-length=120 src/*.py tests/*.py || true
 
       - name: Run mypy
-        run: mypy --ignore-missing-imports *.py
+        run: mypy --ignore-missing-imports src/*.py tests/*.py
 
       - name: Run bandit
-        run: bandit -c pyproject.toml -r *.py
+        run: bandit -c pyproject.toml -r src/ tests/
 
   test:
     name: Run tests
