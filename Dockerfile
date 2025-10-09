@@ -6,6 +6,7 @@ LABEL org.opencontainers.image.description="Automatically updates /etc/hosts wit
 LABEL org.opencontainers.image.licenses=MIT
 
 # Install Docker CLI from official Docker repository
+# shellcheck disable=SC1091
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
