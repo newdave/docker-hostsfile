@@ -3,10 +3,42 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    paths:
+      - '**.py'
+      - 'Makefile'
+      - '.github/workflows/ci.yml'
+      - '.pre-commit-config.yaml'
+      - 'requirements-dev.txt'
+      - 'Dockerfile'
+      - 'scripts/**'
   pull_request:
     branches: [main, develop]
 
 jobs:
+  validate-fix-script:
+    name: Validate auto-fix script
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make script executable
+        run: chmod +x scripts/fix-precommit-issues.sh
+
+      - name: Run fix-issues script
+        run: ./scripts/fix-precommit-issues.sh
+
+      - name: Check for unexpected changes
+        run: |
+          if ! git diff --quiet; then
+            echo "⚠️ Auto-fix script found issues that should have been fixed before commit:"
+            git diff
+            echo ""
+            echo "Run 'make fix-issues' locally to auto-fix these issues"
+            exit 1
+          else
+            echo "✓ No auto-fixable issues found"
+          fi
+
   pre-commit:
     name: Pre-commit checks
     runs-on: ubuntu-latest
