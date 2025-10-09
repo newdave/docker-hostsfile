@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 LABEL org.opencontainers.image.source=https://github.com/newdave/docker-hostsfile
 LABEL org.opencontainers.image.description="Automatically updates /etc/hosts with Docker container IPs and FQDNs"

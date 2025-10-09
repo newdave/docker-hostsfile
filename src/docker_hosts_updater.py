@@ -13,7 +13,7 @@ import sys
 import tempfile
 from pathlib import Path
 from signal import SIGINT, SIGTERM
-from typing import Dict, List, Set
+from typing import List, Set
 
 # Configuration
 HOSTS_FILE = "/etc/hosts"
@@ -222,7 +222,7 @@ def update_hosts_file() -> bool:
         )
 
         # Write to temporary file first
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, dir="/tmp") as temp_file:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, dir=tempfile.gettempdir()) as temp_file:
             temp_file.writelines(new_lines)
             temp_path = temp_file.name
 
@@ -242,7 +242,7 @@ def update_hosts_file() -> bool:
         try:
             if "temp_path" in locals():
                 Path(temp_path).unlink(missing_ok=True)
-        except:
+        except Exception:
             pass
         return False
 
