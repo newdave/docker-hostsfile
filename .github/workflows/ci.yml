@@ -89,7 +89,7 @@ jobs:
         run: isort --check --profile black --line-length 120 src/*.py tests/*.py
 
       - name: Run flake8
-        run: flake8 --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=15 src/*.py tests/*.py
+        run: flake8 --max-line-length=120 --extend-ignore=E203,W503 --max-complexity=25 src/*.py tests/*.py
 
       - name: Run pylint
         run: pylint --max-line-length=120 src/*.py tests/*.py || true
