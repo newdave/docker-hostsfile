@@ -1,7 +1,9 @@
 .PHONY: help install uninstall start stop restart status logs test clean dev-setup
 
 SCRIPT_NAME = docker_hosts_updater.py
+SCRIPT_PATH = src/$(SCRIPT_NAME)
 SERVICE_NAME = docker-hosts-updater
+SERVICE_PATH = systemd/$(SERVICE_NAME).service
 INSTALL_DIR = /usr/local/bin
 SERVICE_DIR = /etc/systemd/system
 
@@ -53,27 +55,27 @@ pre-commit:
 
 format:
 	@echo "Formatting code..."
-	black --line-length 120 *.py
-	isort --profile black --line-length 120 *.py
+	black --line-length 120 src/*.py tests/*.py
+	isort --profile black --line-length 120 src/*.py tests/*.py
 	@echo "✓ Code formatted"
 
 lint:
 	@echo "Running linting checks..."
-	@echo "=== Black ===" && black --check --line-length 120 *.py || true
+	@echo "=== Black ===" && black --check --line-length 120 src/*.py tests/*.py || true
 	@echo ""
-	@echo "=== isort ===" && isort --check --profile black --line-length 120 *.py || true
+	@echo "=== isort ===" && isort --check --profile black --line-length 120 src/*.py tests/*.py || true
 	@echo ""
-	@echo "=== flake8 ===" && flake8 --max-line-length=120 --extend-ignore=E203,W503 *.py || true
+	@echo "=== flake8 ===" && flake8 --max-line-length=120 --extend-ignore=E203,W503 src/*.py tests/*.py || true
 	@echo ""
-	@echo "=== pylint ===" && pylint --max-line-length=120 *.py || true
+	@echo "=== pylint ===" && pylint --max-line-length=120 src/*.py tests/*.py || true
 	@echo ""
-	@echo "=== mypy ===" && mypy --ignore-missing-imports *.py || true
+	@echo "=== mypy ===" && mypy --ignore-missing-imports src/*.py tests/*.py || true
 
 install:
 	@echo "Installing Docker Hosts Updater..."
-	sudo cp $(SCRIPT_NAME) $(INSTALL_DIR)/
+	sudo cp $(SCRIPT_PATH) $(INSTALL_DIR)/
 	sudo chmod +x $(INSTALL_DIR)/$(SCRIPT_NAME)
-	sudo cp $(SERVICE_NAME).service $(SERVICE_DIR)/
+	sudo cp $(SERVICE_PATH) $(SERVICE_DIR)/
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(SERVICE_NAME)
 	@echo "Installation complete. Run 'make start' to start the service."
@@ -119,7 +121,7 @@ docker-logs:
 
 test:
 	@echo "Running in test mode (Ctrl+C to stop)..."
-	sudo python3 $(SCRIPT_NAME) 30s
+	sudo python3 $(SCRIPT_PATH) 30s
 
 test-containers:
 	@echo "Creating test containers..."

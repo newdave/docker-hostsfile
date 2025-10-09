@@ -13,7 +13,7 @@ services:
       # Host's /etc/hosts file
     - /etc/hosts:/etc/hosts
       # The updater script
-    - ./docker_hosts_updater.py:/app/updater.py:ro
+    - ./src/docker_hosts_updater.py:/app/updater.py:ro
 
     # Command with optional domain override
     # Option 1: Use environment variable (see below)
