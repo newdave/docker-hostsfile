@@ -1,4 +1,4 @@
-.PHONY: help install uninstall start stop restart status logs test clean dev-setup
+.PHONY: help install uninstall start stop restart status logs test clean dev-setup fix-issues
 
 SCRIPT_NAME = docker_hosts_updater.py
 SCRIPT_PATH = src/$(SCRIPT_NAME)
@@ -13,6 +13,7 @@ help:
 	@echo "Development:"
 	@echo "  make dev-setup        Install development dependencies and pre-commit hooks"
 	@echo "  make pre-commit       Run pre-commit on all files"
+	@echo "  make fix-issues       Auto-fix common pre-commit issues"
 	@echo "  make lint             Run linting checks (black, isort, flake8, pylint)"
 	@echo "  make format           Auto-format code with black and isort"
 	@echo ""
@@ -52,6 +53,10 @@ dev-setup:
 
 pre-commit:
 	pre-commit run --all-files
+
+fix-issues:
+	@echo "Running auto-fix script..."
+	./scripts/fix-precommit-issues.sh
 
 format:
 	@echo "Formatting code..."
